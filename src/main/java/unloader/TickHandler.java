@@ -46,22 +46,12 @@ public class TickHandler {
             }
         }
 
-        if (w.getChunkProvider().getLoadedChunkCount() != 0) {
-            return;
-        }
-        if (!w.loadedEntityList.isEmpty()) {
-            return;
-        }
-        if (!w.loadedTileEntityList.isEmpty()) {
-            return;
-        }
-        if (!ForgeChunkManager.getPersistentChunksFor(w).isEmpty()) {
-            return;
-        }
-        if (!w.playerEntities.isEmpty()) {
-            return;
-        }
-        if (DimensionManager.shouldLoadSpawn(id)) {
+        if (w.getChunkProvider().getLoadedChunkCount() != 0
+                || !w.loadedEntityList.isEmpty()
+                || !w.loadedTileEntityList.isEmpty()
+                || !ForgeChunkManager.getPersistentChunksFor(w).isEmpty()
+                || !w.playerEntities.isEmpty()
+                || DimensionManager.shouldLoadSpawn(id)) {
             return;
         }
 
