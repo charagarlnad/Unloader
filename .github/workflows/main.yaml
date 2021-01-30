@@ -28,14 +28,3 @@ jobs:
         with:
           name: Libraries
           path: build/libs
-
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout latest code
-        uses: actions/checkout@v2
-
-      - name: Reformat code
-        uses: axel-op/googlejavaformat-action@v2.0.0
-        with:
-          args: "--replace --aosp"
