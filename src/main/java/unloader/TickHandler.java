@@ -12,7 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class TickHandler {
-    private final Logger logger = LogManager.getLogger(UnloaderMod.MODID);
+    private static final Logger logger = LogManager.getLogger(UnloaderMod.MODID);
 
     private int tickCount = 0;
 
@@ -37,14 +37,16 @@ public class TickHandler {
     private void handleDim(Integer id) {
         WorldServer w = DimensionManager.getWorld(id);
 
-        for (String re : UnloaderMod.config.blacklistDims) {
-            if (w.provider.getDimensionName().matches(re)) {
+        for (int re : UnloaderMod.config.blacklistDimIDs)
+            if (id.equals(re))
                 return;
-            }
-            if (Integer.toString(id).matches(re)) {
+
+        // could just precompile a hashtable by mixin into DimensionManager#registerDimension
+        // so that it works with dynamically generated dimensions i.e. mystcraft
+        // performance benefit isn't rly worth it tho
+        for (String re : UnloaderMod.config.blacklistDimStrings)
+            if (w.provider.getDimensionName().matches(re))
                 return;
-            }
-        }
 
         if (w.getChunkProvider().getLoadedChunkCount() != 0
                 || !w.loadedEntityList.isEmpty()
@@ -59,6 +61,7 @@ public class TickHandler {
             w.saveAllChunks(true, null);
         } catch (MinecraftException e) {
             logger.error("Caught an exception while saving all chunks:", e);
+            e.printStackTrace();
         } finally {
             MinecraftForge.EVENT_BUS.post(new WorldEvent.Unload(w));
             w.flush();

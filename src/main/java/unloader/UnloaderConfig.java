@@ -8,15 +8,20 @@ import java.io.File;
 public class UnloaderConfig {
     private final Configuration config;
 
-    public String[] blacklistDims;
+    public int[] blacklistDimIDs;
+    public String[] blacklistDimStrings;
     public int unloadInterval;
 
     public UnloaderConfig(File file) {
         config = new Configuration(file);
 
-        Property propBlacklistDims = config.get(Configuration.CATEGORY_GENERAL, "blacklistDims", new String[]{"0", "Overworld"});
-        propBlacklistDims.comment = "List of dimensions you don't want to unload. Can be dimension name or ID.";
-        blacklistDims = propBlacklistDims.getStringList();
+        Property propBlacklistDimIDs = config.get(Configuration.CATEGORY_GENERAL, "blacklistDimIDs", new int[]{0});
+        propBlacklistDimIDs.comment = "List of dimensions you don't want to unload. Uses dimension ID.";
+        blacklistDimIDs = propBlacklistDimIDs.getIntList();
+
+        Property propBlacklistDimStrings = config.get(Configuration.CATEGORY_GENERAL, "blacklistDimStrings", new String[]{"Overworld"});
+        propBlacklistDimStrings.comment = "List of dimensions you don't want to unload. Uses dimension name.";
+        blacklistDimStrings = propBlacklistDimStrings.getStringList();
 
         Property propUnloadInterval= config.get(Configuration.CATEGORY_GENERAL, "unloadCheck", 600);
         propUnloadInterval.comment = "Time (in ticks) to wait before checking dimensions.";
