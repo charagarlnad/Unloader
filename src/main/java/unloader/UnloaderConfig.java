@@ -1,22 +1,26 @@
 package unloader;
 
-import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
 
-@Config(modid = UnloaderMod.MODID)
-@Config.LangKey(UnloaderMod.MODID + ".config.title")
+import java.io.File;
+
 public class UnloaderConfig {
-    @Config.Name("blacklistDims")
-    @Config.Comment({
-        "List of dimensions you don’t want to unload.",
-        "Can be dimension name or ID. Uses regular expressions.",
-    })
-    @Config.LangKey(UnloaderMod.MODID + ".config.blacklistDims")
-    public static String[] blacklistDims = {"0", "overworld"};
+    private final Configuration config;
 
-    @Config.Name("unloadCheck")
-    @Config.Comment({
-        "Time (in ticks) to wait before checking dimensions",
-    })
-    @Config.LangKey(UnloaderMod.MODID + ".config.unloadCheck")
-    public static Integer unloadInterval = 600;
+    public String[] blacklistDims;
+    public int unloadInterval;
+
+    public UnloaderConfig(File file) {
+        config = new Configuration(file);
+
+        Property propBlacklistDims = config.get(Configuration.CATEGORY_GENERAL, "blacklistDims", new String[]{"0", "overworld"});
+        propBlacklistDims.comment = "List of dimensions you don’t want to unload. Can be dimension name or ID. Uses regular expressions.";
+        blacklistDims = propBlacklistDims.getStringList();
+
+        Property propUnloadInterval= config.get(Configuration.CATEGORY_GENERAL, "unloadCheck", 600);
+        propUnloadInterval.comment = "Time (in ticks) to wait before checking dimensions.";
+        unloadInterval = propUnloadInterval.getInt();
+
+    }
 }

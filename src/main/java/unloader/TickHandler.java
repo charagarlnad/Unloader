@@ -1,17 +1,19 @@
 package unloader;
 
-import net.minecraft.world.DimensionType;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import net.minecraft.world.MinecraftException;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Arrays;
 
 public class TickHandler {
     private final Logger logger = LogManager.getLogger(UnloaderMod.MODID);
@@ -24,12 +26,15 @@ public class TickHandler {
             return;
         }
         tickCount++;
-        if (tickCount < UnloaderConfig.unloadInterval) {
+        if (tickCount < UnloaderMod.config.unloadInterval) {
             return;
         }
         tickCount = 0;
 
         Integer[] dims = DimensionManager.getIDs();
+
+        //System.out.println("peggers list: " + Arrays.toString(dims));
+
         for (Integer id : dims) {
             handleDim(id);
         }
@@ -37,13 +42,9 @@ public class TickHandler {
 
     private void handleDim(Integer id) {
         WorldServer w = DimensionManager.getWorld(id);
-        DimensionType dimType = DimensionManager.getProviderType(id);
+        String dimName = w.getProviderName();
 
-        String dimName = "";
-        if (dimType != null) {
-            dimName = dimType.getName();
-        }
-        for (String re : UnloaderConfig.blacklistDims) {
+        for (String re : UnloaderMod.config.blacklistDims) {
             if (dimName.matches(re)) {
                 return;
             }
@@ -52,25 +53,31 @@ public class TickHandler {
             }
         }
 
-        if (dimType.shouldLoadSpawn()) {
+        if (DimensionManager.shouldLoadSpawn(id)) {
+            System.out.println("spawn");
             return;
         }
 
-        ChunkProviderServer p = w.getChunkProvider();
+        IChunkProvider p = w.getChunkProvider();
         if (p.getLoadedChunkCount() != 0) {
+            System.out.println("loaded chunks");
             return;
         }
-        if (ForgeChunkManager.getPersistentChunksFor(w).isEmpty()) {
+        if (!ForgeChunkManager.getPersistentChunksFor(w).isEmpty()) {
+            System.out.println("persistent chunks");
             return;
         }
 
-        if (w.playerEntities.isEmpty()) {
+        if (!w.playerEntities.isEmpty()) {
+            System.out.println("player entities");
             return;
         }
-        if (w.loadedEntityList.isEmpty()) {
+        if (!w.loadedEntityList.isEmpty()) {
+            System.out.println("loaded entities");
             return;
         }
-        if (w.loadedTileEntityList.isEmpty()) {
+        if (!w.loadedTileEntityList.isEmpty()) {
+            System.out.println("tile entities");
             return;
         }
 
@@ -81,7 +88,8 @@ public class TickHandler {
         } finally {
             MinecraftForge.EVENT_BUS.post(new WorldEvent.Unload(w));
             w.flush();
-            DimensionManager.setWorld(id, null, w.getMinecraftServer());
+            DimensionManager.setWorld(id, null);
+            //DimensionManager.setWorld(id, null, w.func_73046_m());
         }
     }
 }

@@ -4,10 +4,6 @@
   "name": "Unloader",
   "description": "Unload dimensions not in use.",
   "version": "${version}",
-  "url": "https://github.com/yamporg/Unloader",
-  "authorList": [
-    "Ivan Trubach",
-    "Unnoen",
-  ]
+  "url": "https://github.com/yamporg/Unloader"
 }
 ]
