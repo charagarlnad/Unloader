@@ -5,7 +5,6 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
-import net.minecraftforge.common.MinecraftForge;
 
 import java.io.File;
 
@@ -29,15 +28,12 @@ public class UnloaderMod {
 
     @Mod.EventHandler
     public void onServerStarting(FMLServerStartingEvent event) {
-        System.out.println("peggers serv start");
         handler = new TickHandler();
-        //MinecraftForge.EVENT_BUS.register(handler);
         FMLCommonHandler.instance().bus().register(handler);
     }
 
     @Mod.EventHandler
     public void onServerStopped(FMLServerStoppedEvent event) {
-        //MinecraftForge.EVENT_BUS.unregister(handler);
         FMLCommonHandler.instance().bus().unregister(handler);
         handler = null;
     }
